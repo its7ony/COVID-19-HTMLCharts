@@ -1,0 +1,265 @@
+<html>
+  <head>    
+    <script src="js/vis.js"></script>
+    <link rel="stylesheet" href="css/vis.css">
+    <link rel="icon" type="image/png" href="https://cdn.icon-icons.com/icons2/2239/PNG/512/virus_coronavirus_covid_covid_icon_134829.png"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+  <div id="Legend" class="external-legend"></div>
+  <div id="visualization"></div>  
+</body>
+
+<style>
+
+.custom-style1 {
+  fill: #f2ea00;
+  fill-opacity: 0;
+  stroke-width: 2px;
+  stroke: #b3ab00;
+}
+
+.custom-style2 {
+  fill: #00a0f2;
+  fill-opacity: 0;
+  stroke-width: 2px;
+  stroke: #050092;
+}
+
+.custom-style3 {
+  fill: #00f201;
+  fill-opacity: 0;
+  stroke-width: 2px;
+  stroke: #029200;
+}
+
+
+.vis-legend-background {
+  stroke-width: 1px;
+  fill-opacity: 0.9;
+  fill: #ffffff;
+  stroke: #c2c2c2;
+}
+
+.vis-outline {
+  stroke-width: 1px;
+  fill-opacity: 1;
+  fill: #ffffff;
+  stroke: #e5e5e5;
+}
+
+.vis-icon-fill {
+  fill-opacity: 0.3;
+  stroke: none;
+}
+
+
+div.icon-container {
+  float: left;
+}
+
+div.legend-element-container {
+  display: inline-block;
+  width: 200px;
+  height: 30px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #e0e0e0;
+  background-color: #ffffff;
+  margin: 4px;
+  padding: 4px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+}
+div.legend-element-container.hidden {
+  background-color: #d3e6ff;
+}
+
+svg.legend-icon {
+  width: 30px;
+  height: 30px;
+}
+
+</style>
+
+
+<script>
+    var itemsList = []
+    var names = ["México", "Guanajuato", "León"];
+    var groups = new vis.DataSet();
+    var graph2d = null;
+
+        $.ajax({
+      url: "http://localhost:82/graphics/data/Casos%20Diarios.csv",
+      dataType: "text",
+      contentType: "charset-utf-8",
+    }).done(crearObjetos)
+
+
+    function crearObjetos(data) {
+
+      //ELEMENTS
+      var nacional = []
+      var estatal = []
+      var municipio = []
+
+      //DATES
+      var labels = data.split("\n")[0];
+      labels = labels.split(",").splice(3);
+
+      //DATA
+      var data = data.split("\n").splice(1, 3);
+      nacional = data[0].split(",").splice(3);
+      estatal = data[1].split(",").splice(3);
+      municipio = data[2].split(",").splice(3);
+
+      for (var i = 0; i < labels.length; i++) {
+        for (var j = i; j < nacional.length; j++) {
+          for (var k = j; k < estatal.length; k++) {
+            for (var l = k; l < municipio.length; l++) {
+              var iMunicipio = {
+                "x": labels[i],
+                "y": parseInt(municipio[l]),
+                "group": 2
+              };
+              itemsList.push(iMunicipio);
+              break
+            }
+
+            var iEstado = {
+              "x": labels[i],
+              "y": parseInt(estatal[k]),
+              "group": 1
+            };
+            itemsList.push(iEstado);
+            break
+
+          }
+          var iNacional = {
+            "x": labels[i],
+            "y": parseInt(nacional[j]),
+            "group": 0
+          };
+          itemsList.push(iNacional);
+          break
+        }
+      }
+
+      start();
+      
+    }
+</script>
+<script>
+function start(){
+groups.add({
+  id: 0,
+  content: names[0],
+  className: "custom-style1",
+  options: {
+    drawPoints: { style: "square", size: 10 },
+  },
+});
+
+groups.add({
+  id: 1,
+  content: names[1],
+  className: "custom-style2",
+  options: {
+    drawPoints: { style: "square", size: 10 },
+  },
+});
+
+groups.add({
+  id: 2,
+  content: names[2],
+  className: "custom-style3",
+  options: {
+    drawPoints: { style: "square", size: 10 },
+  },
+});
+
+
+var container = document.getElementById("visualization");
+var items = itemsList;
+
+var dataset = new vis.DataSet(items);
+var options = {
+  dataAxis: { showMinorLabels: false },
+  start: "2020-01-07",
+  end: "2020-05-21",
+};
+
+graph2d = new vis.Graph2d(container, items, groups, options);
+
+populateExternalLegend();
+}
+
+
+function populateExternalLegend() {
+  var groupsData = groups.get();
+  var legendDiv = document.getElementById("Legend");
+  legendDiv.innerHTML = "";
+
+  // get for all groups:
+  for (var i = 0; i < groupsData.length; i++) {
+    // create divs
+    var containerDiv = document.createElement("div");
+    var iconDiv = document.createElement("div");
+    var descriptionDiv = document.createElement("div");
+
+    // give divs classes and Ids where necessary
+    containerDiv.className = "legend-element-container";
+    containerDiv.id = groupsData[i].id + "_legendContainer";
+    iconDiv.className = "icon-container";
+    descriptionDiv.className = "description-container";
+
+    var legend = graph2d.getLegend(groupsData[i].id, 30, 30);
+
+    legend.icon.setAttributeNS(null, "class", "legend-icon");
+
+    iconDiv.appendChild(legend.icon);
+    descriptionDiv.innerHTML = legend.label;
+
+    if (legend.orientation == "left") {
+      descriptionDiv.style.textAlign = "left";
+      containerDiv.appendChild(iconDiv);
+      containerDiv.appendChild(descriptionDiv);
+    } else {
+      descriptionDiv.style.textAlign = "right";
+      containerDiv.appendChild(descriptionDiv);
+      containerDiv.appendChild(iconDiv);
+    }
+
+    legendDiv.appendChild(containerDiv);
+
+    containerDiv.onclick = toggleGraph.bind(this, groupsData[i].id);
+  }
+}
+
+/**
+ * This function switchs the visible option of the selected group on an off.
+ * @param groupId
+ */
+function toggleGraph(groupId) {
+  // get the container that was clicked on.
+  var container = document.getElementById(groupId + "_legendContainer");
+  // if visible, hide
+  if (graph2d.isGroupVisible(groupId) == true) {
+    groups.update({ id: groupId, visible: false });
+    container.className = container.className + " hidden";
+  } else {
+    // if invisible, show
+    groups.update({ id: groupId, visible: true });
+    container.className = container.className.replace("hidden", "");
+  }
+}
+
+</script>
+
+
+</html>

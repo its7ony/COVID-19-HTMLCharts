@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="https://d3js.org/topojson.v1.min.js"></script>
+    <script>
+      $( document ).ready(function() {
+        $('#mapSection').load('http://localhost:82/graphics/covidMap.html');
+      });
+    </script>
+    <link rel="icon" type="image/png" href="https://cdn.icon-icons.com/icons2/2239/PNG/512/virus_coronavirus_covid_covid_icon_134829.png"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Defunciones Por COVID-19</title>
+</head>
+<body>
+    <div class="card text-center">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a class="nav-link" href="http://localhost:82/graphics/index.html">Casos Confirmados de Covid-19</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="http://localhost:82/graphics/covid.html">Defunciones por Covid-19</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="http://localhost:82/graphics/cases.html">Casos por Día</a>
+          </li>
+        </ul>
+      </div>
+        <div class="card-body">
+            <h2 style="text-align: center;"><span class="badge badge-secondary">Defunciones Por COVID-19 en México</span></h2>
+          <h5 class="card-title">Utilizando D3.js</h5>
+          <div id="mapSection"></div>
+        </div>
+      </div>
+</body>
+</html>
